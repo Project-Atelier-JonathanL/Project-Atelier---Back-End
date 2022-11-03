@@ -1,11 +1,11 @@
+require("dotenv").config();
 const { Client } = require('pg')
 
 const client = new Client({
-  user: 'jonathanliang',
-  host: 'localhost',
-  database: 'sdc_reviews',
-  password: 'rootuser',
-  port: 5432
+  user: process.env.DB_USER,
+  host: process.env.DB_HOST,
+  database: process.env.DB_NAME,
+  password: process.env.DB_PASS,
 })
 
 client.connect()
@@ -53,3 +53,5 @@ client.query('SELECT * FROM reviews_photos WHERE id=123',
     }
     client.end()
 })
+
+module.exports = client;
