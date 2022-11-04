@@ -34,12 +34,18 @@ app.get('/', (req, res) => {
   res.send("hi")
 })
 
-app.get('reviews/meta', (req, res) => {
+app.get('/reviews/meta', (req, res) => {
 
 })
 
-app.get('reviews', (req, res) => {
-
+app.get('/reviews', (req, res) => {
+  db.query('SELECT * FROM reviews WHERE id=1', (err, result) => {
+    if (err) {
+      console.log(err)
+    } else {
+      res.json(result.rows)
+    }
+  })
 })
 
 app.post('reviews', (req, res) => {
