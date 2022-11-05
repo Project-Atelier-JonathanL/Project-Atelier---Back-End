@@ -25,11 +25,6 @@ app.get('/', (req, res) => {
     .catch(err => console.log(err))
 })
 
-app.get('/reviews/meta', (req, res) => {
-
-})
-
-
 // Product_id ONLY
 app.get('/reviews/product_id/:product_id', (req, res) => {
   console.log(req.params)
@@ -38,9 +33,6 @@ app.get('/reviews/product_id/:product_id', (req, res) => {
       const arr = [];
       for (let i = 0; i < 5; i++) {
         let row = result.rows[i]
-        // let photos;
-        // db.query(`SELECT * FROM reviews_photos WHERE review_id=${row.id}`)
-        //   .then(result => photos = result)
         arr.push({
           "review_id": row.id,
           "rating": row.rating,
@@ -67,14 +59,22 @@ app.get('/reviews/product_id/:product_id', (req, res) => {
 // Product_id && COUNT ONLY
 app.get('/reviews/product_id/:product_id/count/:count', (req, res) => {
   console.log(req.params)
+  let photos;
+  let photosArr = []
+  const arr = [];
+  // for (let j = 0; j < photosArr.length; j++) {
+  //   db.query(`SELECT * FROM reviews_photos WHERE review_id=${row.id}`)
+  //     .then(result => photosArr.push(result))
+  // }
   db.query(`SELECT * FROM reviews WHERE product_id=${req.params.product_id}`)
     .then(result => {
-      const arr = [];
       for (let i = 0; i < req.params.count; i++) {
         let row = result.rows[i]
+        if (!row) {
+          break;
+        }
+        photosArr.push(row.id)
         // let photos;
-        // db.query(`SELECT * FROM reviews_photos WHERE review_id=${row.id}`)
-        //   .then(result => photos = result)
         arr.push({
           "review_id": row.id,
           "rating": row.rating,
@@ -87,6 +87,7 @@ app.get('/reviews/product_id/:product_id/count/:count', (req, res) => {
           "helpfulness": row.helpfulness,
           "photos": []
         })
+        console.log(photosArr)
       }
       res.json({
         "product": req.params.product_id,
