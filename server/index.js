@@ -126,13 +126,14 @@ app.get('/reviews/meta/product_id/:product_id', (req, res) => {
           recommend.false = recommend.false.toString()
         }
       }
+      res.json({
+        product_id: req.params.product_id,
+        ratings: ratings,
+        recommended: recommend,
+        characteristics: {}
+      })
     })
     // db.query('')
-    res.json({
-      product_id: req.params.product_id,
-      ratings: ratings,
-      recommended: recommend
-    })
 })
 
 app.put('/reviews/:review_id/helpful', (req, res) => {
