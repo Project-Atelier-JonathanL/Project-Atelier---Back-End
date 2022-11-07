@@ -104,8 +104,10 @@ app.get('/reviews/meta/product_id/:product_id', (req, res) => {
   console.log(req.params)
   let ratings = {}
   let recommend = {'false': '0', 'true': '0'}
+  let characteristics = {};
   db.query(`SELECT * from reviews WHERE product_id=${req.params.product_id}`)
-    .then(result => {
+    .then((result) => {
+      console.log('works')
       for (let i = 0; i < result.rows.length; i++) {
         let row = result.rows[i]
         if (!ratings[row.rating]) {
@@ -116,6 +118,7 @@ app.get('/reviews/meta/product_id/:product_id', (req, res) => {
           ratings[row.rating] = ratings[row.rating].toString()
         }
       }
+      console.log('two')
       for (let j = 0; j < result.rows.length; j++) {
         let row = result.rows[j]
         if (row.recommend === true) {
@@ -126,14 +129,106 @@ app.get('/reviews/meta/product_id/:product_id', (req, res) => {
           recommend.false = recommend.false.toString()
         }
       }
-      res.json({
-        product_id: req.params.product_id,
-        ratings: ratings,
-        recommended: recommend,
-        characteristics: {}
-      })
+      console.log('tree')
+      db.query(`SELECT * FROM characteristics WHERE product_id=${req.params.product_id}`)
+        .then((charResult) => {
+          const ids = []
+          for (let k = 0; k < charResult.rows.length; k++) {
+            ids.push(charResult.rows[k].id)
+          }
+          console.log(ids)
+          if (ids[0]) {
+            console.log('ids[0]')
+            db.query(`SELECT * FROM characteristic_reviews WHERE characteristic_id=${ids[0]}`)
+            .then(res_id => {
+              let total = 0;
+              for (let l = 0; l < res_id.rows.length; l++) {
+                total += res_id.rows[l].value
+              }
+              let value = (total / res_id.rows.length)
+              characteristics[charResult.rows[0].name] = {id: charResult.rows[0].id, value: value.toString()}
+              if (ids.length === 1) {
+                console.log('four')
+                res.json({
+                  product_id: req.params.product_id,
+                  ratings: ratings,
+                  recommended: recommend,
+                  characteristics: characteristics
+                })
+              }
+            })
+          }
+          if (ids[1]) {
+            console.log('ids[0]')
+            db.query(`SELECT * FROM characteristic_reviews WHERE characteristic_id=${ids[1]}`)
+            .then(res_id => {
+              let total = 0;
+              for (let l = 0; l < res_id.rows.length; l++) {
+                total += res_id.rows[l].value
+              }
+              let value = (total / res_id.rows.length)
+              characteristics[charResult.rows[1].name] = {id: charResult.rows[1].id, value: value.toString()}
+              if (ids.length === 2) {
+                console.log('four')
+                res.json({
+                  product_id: req.params.product_id,
+                  ratings: ratings,
+                  recommended: recommend,
+                  characteristics: characteristics
+                })
+              }
+            })
+          }
+          if (ids[2]) {
+            console.log('ids[0]')
+            db.query(`SELECT * FROM characteristic_reviews WHERE characteristic_id=${ids[2]}`)
+            .then(res_id => {
+              let total = 0;
+              for (let l = 0; l < res_id.rows.length; l++) {
+                total += res_id.rows[l].value
+              }
+              let value = (total / res_id.rows.length)
+              characteristics[charResult.rows[2].name] = {id: charResult.rows[2].id, value: value.toString()}
+              if (ids.length === 3) {
+                console.log('four')
+                res.json({
+                  product_id: req.params.product_id,
+                  ratings: ratings,
+                  recommended: recommend,
+                  characteristics: characteristics
+                })
+              }
+            })
+          }
+          if (ids[3]) {
+            console.log('ids[0]')
+            db.query(`SELECT * FROM characteristic_reviews WHERE characteristic_id=${ids[3]}`)
+            .then(res_id => {
+              let total = 0;
+              for (let l = 0; l < res_id.rows.length; l++) {
+                total += res_id.rows[l].value
+              }
+              let value = (total / res_id.rows.length)
+              characteristics[charResult.rows[3].name] = {id: charResult.rows[3].id, value: value.toString()}
+              if (ids.length === 4) {
+                console.log('four')
+                res.json({
+                  product_id: req.params.product_id,
+                  ratings: ratings,
+                  recommended: recommend,
+                  characteristics: characteristics
+                })
+              }
+            })
+          }
+
+        })
+        .catch(err => {
+          console.log('it didnt work')
+          res.status(500)
+        })
     })
-    // db.query('')
+
 })
 
 app.put('/reviews/:review_id/helpful', (req, res) => {
