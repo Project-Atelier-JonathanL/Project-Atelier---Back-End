@@ -265,7 +265,7 @@ app.post('/reviews', (req, res) => {
                  '${req.body.email}',
                   ${0}
                   ) RETURNING *`)
-        .then(resst => res.json(resst.rows))
+        .then(resst => res.status(201).json(resst.rows))
         .catch(err => console.log('error/....', err))
     })
 

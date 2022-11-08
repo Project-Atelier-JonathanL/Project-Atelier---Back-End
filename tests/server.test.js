@@ -38,19 +38,31 @@ describe('SDC R&R services', () => {
 
   });
 
-  test('Should send back reviews with product id', async () => {
+  test('should send a post request', async () => {
 
-    const { data, status } = await axios.get(`${API_URL}/reviews/product_id/1/`);
-    expect(status).toEqual(200);
-    expect(Array.isArray(data.results)).toEqual(true)
+    const results = await axios.post(`${API_URL}/reviews/`, reviews_meta_body);
+    // console.log('post', results)
+    expect(results.status).toEqual(201);
+    expect(results.config.method).toEqual('post')
+    expect(Array.isArray(results.data)).toEqual(true)
 
   });
 
-  test('Should send back reviews with product id', async () => {
+  test('Should increase helpfulness count by 1', async () => {
 
-    const { data, status } = await axios.get(`${API_URL}/reviews/product_id/1/`);
-    expect(status).toEqual(200);
-    expect(Array.isArray(data.results)).toEqual(true)
+    const results = await axios.put(`${API_URL}/reviews/1/helpful`);
+    // console.log(results)
+    expect(results.status).toEqual(200);
+    expect(results.config.method).toEqual('put')
+
+  });
+
+  test('Should change reported to true', async () => {
+
+    const results = await axios.put(`${API_URL}/reviews/1/report`);
+    console.log(results)
+    expect(results.status).toEqual(200);
+    expect(results.config.method).toEqual('put')
 
   });
 })
