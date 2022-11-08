@@ -44,9 +44,10 @@ pool.query('CREATE TABLE IF NOT EXISTS characteristic_reviews (id SERIAL PRIMARY
     }
 })
 // \copy characteristic_reviews from '../../../../Users/jonathanliang/Desktop/SDCdata/characteristic_reviews.csv' csv header;
-pool.query(`SELECT * FROM characteristic_reviews WHERE characteristic_id=122`)
-.then(result => {
-  console.log('this is the characteristics', result.rows)
-})
+// pool.query(`SELECT * FROM characteristic_reviews WHERE characteristic_id=122`)
+// .then(result => {
+//   console.log('this is the characteristics', result.rows)
+//   console.log(new Date())
+// })
 
 module.exports = pool;

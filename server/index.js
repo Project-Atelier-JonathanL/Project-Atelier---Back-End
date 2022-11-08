@@ -31,7 +31,8 @@ app.get('/reviews/product_id/:product_id', (req, res) => {
   db.query(`SELECT * FROM reviews WHERE product_id=${req.params.product_id}`)
     .then(result => {
       const arr = [];
-      for (let i = 0; i < 5; i++) {
+      let lengths = result.rows.length <= 5 ? result.rows.length : 5
+      for (let i = 0; i < lengths; i++) {
         let row = result.rows[i]
         arr.push({
           "review_id": row.id,
@@ -227,6 +228,45 @@ app.get('/reviews/meta/product_id/:product_id', (req, res) => {
           console.log('it didnt work')
           res.status(500)
         })
+    })
+    .catch(err => console.log(err))
+
+})
+
+app.get('/testing' , (req, res) => {
+  db.query(`SELECT * FROM reviews WHERE id=(SELECT max(id) FROM reviews)`)
+    .then(result => res.send(result.rows))
+})
+
+app.post('/reviews', (req, res) => {
+  console.log('req.body', req.body)
+  let maxVal = 0;
+  db.query(`SELECT * FROM reviews WHERE id=(SELECT max(id) FROM reviews)`)
+  .then(result => {
+      for (let i = 0; i < result.rows.length; i++) {
+        console.log(result.rows[i].id)
+        maxVal += result.rows[i].id
+        maxVal += 1
+      }
+      console.log('THDSFJPIDSJ', maxVal)
+      let date = new Date();
+      // date = date.toString()
+      db.query(`INSERT INTO reviews(id, product_id, rating, date, summary, body, recommend, reported, reviewer_name, reviewer_email, helpfulness)
+        VALUES (
+          ${maxVal},
+          ${req.body.product_id},
+           ${req.body.rating},
+           '${date}',
+             '${req.body.summary}',
+              '${req.body.body}',
+               ${req.body.recommend},
+               ${false},
+                '${req.body.name}',
+                 '${req.body.email}',
+                  ${0}
+                  ) RETURNING *`)
+        .then(resst => res.json(resst.rows))
+        .catch(err => console.log('error/....', err))
     })
 
 })
