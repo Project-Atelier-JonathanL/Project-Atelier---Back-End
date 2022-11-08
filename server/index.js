@@ -272,11 +272,32 @@ app.post('/reviews', (req, res) => {
 })
 
 app.put('/reviews/:review_id/helpful', (req, res) => {
-
+  db.query(`SELECT * FROM reviews WHERE id=${req.params.review_id}`)
+    .then(result => {
+      console.log('one')
+      let helpful = result.rows[0].helpfulness + 1
+      db.query(`UPDATE reviews SET helpfulness = $1 WHERE id=${req.params.review_id}`, [helpful])
+        .then(results => {
+          console.log('two')
+          res.status(200)
+          res.send(`updated review ${req.params.review_id} helpfulness to ${helpful}`)
+        })
+        .catch(err => console.log(err))
+    })
 })
 
 app.put('/reviews/:review_id/report', (req, res) => {
-
+  db.query(`SELECT * FROM reviews WHERE id=${req.params.review_id}`)
+    .then(result => {
+      console.log('one')
+      db.query(`UPDATE reviews SET reported = $1 WHERE id=${req.params.review_id}`, [true])
+        .then(results => {
+          console.log('two')
+          res.status(200)
+          res.send(`updated review ${req.params.review_id} report to ${true}`)
+        })
+        .catch(err => console.log(err))
+    })
 })
 
 
