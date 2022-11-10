@@ -53,42 +53,40 @@ app.get('/reviews/product_id/:product_id', async (req, res) => {
 })
 
 // Product_id && COUNT ONLY
-app.get('/reviews/product_id/:product_id/count/:count', (req, res) => {
+app.get('/reviews/product_id/:product_id/count/:count', async (req, res) => {
   console.log(req.params)
-  let photos;
-  let photosArr = []
   const arr = [];
-  db.query(`SELECT * FROM reviews WHERE product_id=${req.params.product_id}`)
-    .then(result => {
-      for (let i = 0; i < req.params.count; i++) {
-        let row = result.rows[i]
-        if (!row) {
-          break;
-        }
-        photosArr.push(row.id)
-        // let photos;
-        arr.push({
-          "review_id": row.id,
-          "rating": row.rating,
-          "summary": row.summary,
-          "recommend": row.recommend,
-          "response": row.response,
-          "body": row.body,
-          "date": row.date,
-          "reviewer_name": row.reviewer_name,
-          "helpfulness": row.helpfulness,
-          "photos": []
-        })
-        console.log(photosArr)
+  let result;
+  try {
+    result = await db.query(`SELECT * FROM reviews WHERE product_id=${req.params.product_id}`)
+  } catch (err) {
+    console.log(err)
+  }
+    for (let i = 0; i < req.params.count; i++) {
+      let row = result.rows[i]
+      if (!row) {
+        break;
       }
-      res.json({
-        "product": req.params.product_id,
-        "page": 0,
-        "count": req.params.count,
-        "results": arr
+      let photos = await db.query(`SELECT * FROM reviews_photos WHERE review_id=${row.id}`)
+      arr.push({
+        "review_id": row.id,
+        "rating": row.rating,
+        "summary": row.summary,
+        "recommend": row.recommend,
+        "response": row.response,
+        "body": row.body,
+        "date": row.date,
+        "reviewer_name": row.reviewer_name,
+        "helpfulness": row.helpfulness,
+        "photos": photos.rows
       })
-     })
-    .catch(err => console.log(err))
+    }
+    res.json({
+      "product": req.params.product_id,
+      "page": 0,
+      "count": req.params.count,
+      "results": arr
+    })
 })
 
 // META ? PRODUCT_ID
