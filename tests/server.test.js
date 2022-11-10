@@ -33,6 +33,7 @@ describe('SDC R&R services', () => {
   test('Should get back status 200 and check if results is an Array', async () => {
 
     const { data, status } = await axios.get(`${API_URL}/reviews/product_id/1/`);
+
     expect(status).toEqual(200);
     expect(Array.isArray(data.results)).toEqual(true)
 
@@ -47,6 +48,16 @@ describe('SDC R&R services', () => {
     expect(Array.isArray(results.data)).toEqual(true)
 
   });
+
+  test('Should get back Meta data', async () => {
+
+    const result = await axios.get(`${API_URL}/reviews/meta/product_id/1/`);
+    console.log(result)
+    // expect(status).toEqual(200);
+    // expect(Array.isArray(data.results)).toEqual(true)
+
+  });
+
 
   test('Should increase helpfulness count by 1', async () => {
 

@@ -9,16 +9,6 @@ const app = express();
 
 app.use(express.json())
 
-app.get('/test', (req, res) => {
-  db.query('SELECT * FROM reviews WHERE id=1', (err, res) => {
-    if (err) {
-      console.log(err)
-    } else {
-      console.log(res)
-    }
-  })
-})
-
 app.get('/', (req, res) => {
   db.query('SELECT * FROM reviews WHERE id=1')
     .then(result => res.send(result.rows))
@@ -26,35 +16,40 @@ app.get('/', (req, res) => {
 })
 
 // Product_id ONLY
-app.get('/reviews/product_id/:product_id', (req, res) => {
+app.get('/reviews/product_id/:product_id', async (req, res) => {
   console.log(req.params)
-  db.query(`SELECT * FROM reviews WHERE product_id=${req.params.product_id}`)
-    .then(result => {
-      const arr = [];
-      let lengths = result.rows.length <= 5 ? result.rows.length : 5
-      for (let i = 0; i < lengths; i++) {
-        let row = result.rows[i]
-        arr.push({
-          "review_id": row.id,
-          "rating": row.rating,
-          "summary": row.summary,
-          "recommend": row.recommend,
-          "response": row.response,
-          "body": row.body,
-          "date": row.date,
-          "reviewer_name": row.reviewer_name,
-          "helpfulness": row.helpfulness,
-          "photos": []
-        })
-      }
-      res.json({
-        "product": req.params.product_id,
-        "page": 0,
-        "count": 5,
-        "results": arr
+
+  let result;
+  try {
+    result = await db.query(`SELECT * FROM reviews WHERE product_id=${req.params.product_id}`)
+  } catch (err) {
+      console.log(err)
+    }
+
+    const arr = [];
+    let lengths = result.rows.length <= 5 ? result.rows.length : 5
+    for (let i = 0; i < lengths; i++) {
+      let row = result.rows[i]
+      let photos = await db.query(`SELECT * FROM reviews_photos WHERE review_id=${row.id}`)
+      arr.push({
+        "review_id": row.id,
+        "rating": row.rating,
+        "summary": row.summary,
+        "recommend": row.recommend,
+        "response": row.response,
+        "body": row.body,
+        "date": row.date,
+        "reviewer_name": row.reviewer_name,
+        "helpfulness": row.helpfulness,
+        "photos": photos.rows
       })
-     })
-    .catch(err => console.log(err))
+    }
+    res.json({
+      "product": req.params.product_id,
+      "page": 0,
+      "count": 5,
+      "results": arr
+    })
 })
 
 // Product_id && COUNT ONLY
@@ -63,10 +58,6 @@ app.get('/reviews/product_id/:product_id/count/:count', (req, res) => {
   let photos;
   let photosArr = []
   const arr = [];
-  // for (let j = 0; j < photosArr.length; j++) {
-  //   db.query(`SELECT * FROM reviews_photos WHERE review_id=${row.id}`)
-  //     .then(result => photosArr.push(result))
-  // }
   db.query(`SELECT * FROM reviews WHERE product_id=${req.params.product_id}`)
     .then(result => {
       for (let i = 0; i < req.params.count; i++) {
@@ -139,7 +130,6 @@ app.get('/reviews/meta/product_id/:product_id', (req, res) => {
           }
           console.log(ids)
           if (ids[0]) {
-            console.log('ids[0]')
             db.query(`SELECT * FROM characteristic_reviews WHERE characteristic_id=${ids[0]}`)
             .then(res_id => {
               let total = 0;
@@ -160,7 +150,6 @@ app.get('/reviews/meta/product_id/:product_id', (req, res) => {
             })
           }
           if (ids[1]) {
-            console.log('ids[0]')
             db.query(`SELECT * FROM characteristic_reviews WHERE characteristic_id=${ids[1]}`)
             .then(res_id => {
               let total = 0;
@@ -181,7 +170,6 @@ app.get('/reviews/meta/product_id/:product_id', (req, res) => {
             })
           }
           if (ids[2]) {
-            console.log('ids[0]')
             db.query(`SELECT * FROM characteristic_reviews WHERE characteristic_id=${ids[2]}`)
             .then(res_id => {
               let total = 0;
@@ -202,7 +190,6 @@ app.get('/reviews/meta/product_id/:product_id', (req, res) => {
             })
           }
           if (ids[3]) {
-            console.log('ids[0]')
             db.query(`SELECT * FROM characteristic_reviews WHERE characteristic_id=${ids[3]}`)
             .then(res_id => {
               let total = 0;
@@ -231,11 +218,6 @@ app.get('/reviews/meta/product_id/:product_id', (req, res) => {
     })
     .catch(err => console.log(err))
 
-})
-
-app.get('/testing' , (req, res) => {
-  db.query(`SELECT * FROM reviews WHERE id=(SELECT max(id) FROM reviews)`)
-    .then(result => res.send(result.rows))
 })
 
 app.post('/reviews', (req, res) => {

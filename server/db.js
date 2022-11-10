@@ -5,7 +5,7 @@ const pool = new Pool({
   user: process.env.DB_USER,
   host: process.env.DB_HOST,
   database: process.env.DB_NAME,
-  password: process.env.DB_PASS,
+  password: process.env.DB_PASS
 })
 
 pool.connect()
@@ -44,10 +44,19 @@ pool.query('CREATE TABLE IF NOT EXISTS characteristic_reviews (id SERIAL PRIMARY
     }
 })
 // \copy characteristic_reviews from '../../../../Users/jonathanliang/Desktop/SDCdata/characteristic_reviews.csv' csv header;
+// CREATE INDEX index ON reviews (product_id);
+// CREATE INDEX char_reviews_idex ON characteristic_reviews (characteristic_id);
 // pool.query(`SELECT * FROM reviews WHERE id=1`)
 // .then(result => {
 //   console.log('this is the characteristics', result.rows)
 //   console.log(new Date())
 // })
+
+pool.query(`SELECT * FROM reviews_photos WHERE review_id=123`)
+.then(result => {
+  console.log('this is the characteristics', result.rows)
+  console.log(new Date())
+})
+
 
 module.exports = pool;
